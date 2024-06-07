@@ -60,6 +60,8 @@ private slots:
     void on_addBtn_clicked();
     void on_changeWorkTimeBtn_clicked();
 
+    void on_delPicWaitTimeBtn_clicked();
+
 private:
     Ui::Widget *ui;
     QList<Road*> m_roadList;            // 路口列表
@@ -72,7 +74,7 @@ private:
     QTime m_stopTime;                   // 辅助屏关闭时间
     int m_picsSaveDays;                 // 备份文件最大保存时间
     e_encoding m_encoding = unknow;     // 摄像头上传文件的编码
-    int m_delPicWaitTime = 300;         // 处理图片延时
+    int m_delPicWaitTime = 500;         // 处理图片延时
 
 };
 #endif // WIDGET_H

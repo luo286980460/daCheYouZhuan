@@ -26,6 +26,7 @@ Widget::Widget(QWidget *parent)
     setWindowTitle("大车右转辅助屏控制端_2024年06月07日");
     setFixedSize(size());
 
+    ui->delPicWaitTime1->setValue(m_delPicWaitTime);
     connect(ui->ipList, SIGNAL(currentIndexChanged(int)), this, SLOT(slotIpListCurrentIndexChanged(int)));
 
     initTimer();        // 初始化定时器
@@ -274,8 +275,6 @@ void Widget::dealPicFilesUTF_8(QString filePath)
 //    QTimer::singleShot(m_delPicWaitTime, &eventloop, SLOT(quit()));
 //    eventloop.exec();
 
-    QThread::msleep(m_delPicWaitTime);
-
     Road* road = nullptr;
     QString cameraIp = filePath.split("/", Qt::SkipEmptyParts).at(3);
     foreach(Road* tmp, m_roadList){
@@ -306,11 +305,10 @@ void Widget::dealPicFilesUTF_8(QString filePath)
         if(strList.size() != 5) {
             showMsg("文件名格式不对：" + QString::number(strList.size()));
             showMsg(fileName);
-            //showMsg(fileName.toLocal8Bit());
             remove(fileNamePath.toLocal8Bit());
             continue;
         }else if(fileNamePath .contains("ini")){
-            showMsg("ini文件：" + fileNamePath);
+            //showMsg("ini文件：" + fileNamePath);
             remove(fileNamePath.toLocal8Bit());
             continue;
         }
@@ -318,6 +316,7 @@ void Widget::dealPicFilesUTF_8(QString filePath)
 
         //if(fileName.toLocal8Bit().contains("黄")){     // 如果是黄牌，发送至屏幕
         if(fileName.contains("黄")){     // 如果是黄牌，发送至屏幕
+            QThread::msleep(m_delPicWaitTime);
             // 车道号是否正确
             if(road->getRoadNum().toInt() == QString(strList.at(3)).toInt()){
                 //是否在工作时间
@@ -350,8 +349,6 @@ void Widget::dealPicFilesGB2312(QString filePath)
 //    QTimer::singleShot(m_delPicWaitTime, &eventloop, SLOT(quit()));
 //    eventloop.exec();
 
-    QThread::msleep(m_delPicWaitTime);
-
     Road* road = nullptr;
     QString cameraIp = filePath.split("/", Qt::SkipEmptyParts).at(3);
 
@@ -393,6 +390,7 @@ void Widget::dealPicFilesGB2312(QString filePath)
 
         //if(fileName.toLocal8Bit().contains("黄")){     // 如果是黄牌，发送至屏幕
         if(fileName.contains("黄")){     // 如果是黄牌，发送至屏幕
+            QThread::msleep(m_delPicWaitTime);
             // 车道号是否正确
             if(road->getRoadNum().toInt() == QString(strList.at(3)).toInt()){
                 //是否在工作时间
@@ -421,9 +419,6 @@ void Widget::dealPicFilesUnkown(QString filePath)
 //    QTimer::singleShot(m_delPicWaitTime, &eventloop, SLOT(quit()));
 //    eventloop.exec();
 
-
-    QThread::msleep(m_delPicWaitTime);
-
     Road* road = nullptr;
     QString cameraIp = filePath.split("/", Qt::SkipEmptyParts).at(3);
 
@@ -465,6 +460,7 @@ void Widget::dealPicFilesUnkown(QString filePath)
 
         //if(fileName.toLocal8Bit().contains("黄")){     // 如果是黄牌，发送至屏幕
         if(fileName.contains("黄")){     // 如果是黄牌，发送至屏幕
+            QThread::msleep(m_delPicWaitTime);
             // 车道号是否正确
             if(road->getRoadNum().toInt() == QString(strList.at(3)).toInt()){
                 //是否在工作时间
@@ -623,5 +619,12 @@ void Widget::on_changeWorkTimeBtn_clicked()
     settings.setValue(QString("others/stopTime"), m_stopTime.toString("hh:mm:ss"));
     showMsg("程序工作时间修改成功");
     system("sudo sync");
+}
+
+
+void Widget::on_delPicWaitTimeBtn_clicked()
+{
+    m_delPicWaitTime = ui->delPicWaitTime1->value();
+    showMsg("延时修改成功：" + QString::number(m_delPicWaitTime));
 }
 
