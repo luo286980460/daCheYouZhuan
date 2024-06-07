@@ -72,6 +72,7 @@ private:
     QTime m_stopTime;                   // 辅助屏关闭时间
     int m_picsSaveDays;                 // 备份文件最大保存时间
     e_encoding m_encoding = unknow;     // 摄像头上传文件的编码
+    int m_delPicWaitTime = 300;         // 处理图片延时
 
 };
 #endif // WIDGET_H

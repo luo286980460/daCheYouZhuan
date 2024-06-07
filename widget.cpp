@@ -6,6 +6,7 @@
 #include <QSerialPortInfo>
 #include <QTextCodec>
 #include <QDebug>
+#include <QThread>
 
 #include "widget.h"
 #include "ui_widget.h"
@@ -22,7 +23,7 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setWindowTitle("大车右转辅助屏控制端_2024年06月06日");
+    setWindowTitle("大车右转辅助屏控制端_2024年06月07日");
     setFixedSize(size());
 
     connect(ui->ipList, SIGNAL(currentIndexChanged(int)), this, SLOT(slotIpListCurrentIndexChanged(int)));
@@ -269,13 +270,14 @@ void Widget::dealPicFiles(QString filePath)
 
 void Widget::dealPicFilesUTF_8(QString filePath)
 {
-    QEventLoop eventloop;
-    QTimer::singleShot(100, &eventloop, SLOT(quit()));
-    eventloop.exec();
+//    QEventLoop eventloop;
+//    QTimer::singleShot(m_delPicWaitTime, &eventloop, SLOT(quit()));
+//    eventloop.exec();
+
+    QThread::msleep(m_delPicWaitTime);
 
     Road* road = nullptr;
-    QString cameraIp = filePath.split("/", QString::SkipEmptyParts).at(3);
-
+    QString cameraIp = filePath.split("/", Qt::SkipEmptyParts).at(3);
     foreach(Road* tmp, m_roadList){
         if(tmp->getCameraIp() == cameraIp){
             road = tmp;
@@ -296,15 +298,19 @@ void Widget::dealPicFilesUTF_8(QString filePath)
     //遍历文件信息链表,并进行相关操作
     foreach (QFileInfo info, inforList) {
         QString fileName = info.fileName();
-        qDebug() << "fileName: " << fileName;
+        //qDebug() << "fileName: " << fileName;
 
         QString fileNamePath = info.filePath();
-        QStringList strList = QString(fileName.toLocal8Bit()).split("_", QString::SkipEmptyParts);
+        QStringList strList = QString(fileName.toLocal8Bit()).split("_", Qt::SkipEmptyParts);
 
         if(strList.size() != 5) {
             showMsg("文件名格式不对：" + QString::number(strList.size()));
             showMsg(fileName);
             //showMsg(fileName.toLocal8Bit());
+            remove(fileNamePath.toLocal8Bit());
+            continue;
+        }else if(fileNamePath .contains("ini")){
+            showMsg("ini文件：" + fileNamePath);
             remove(fileNamePath.toLocal8Bit());
             continue;
         }
@@ -318,7 +324,10 @@ void Widget::dealPicFilesUTF_8(QString filePath)
                 if(QTime::currentTime() > m_startTime && QTime::currentTime() < m_stopTime){
                     // 备份图片
                     rename((road->getPicPath() + "/" + fileName).toLocal8Bit(), (road->getPicPathBack()+ "/" + fileName).toLocal8Bit());
-                    sendData(road, fileName.split("_", QString::SkipEmptyParts).at(1), "黄");
+                    showMsg(road->getPicPath() + "/" + fileName);
+                    showMsg(road->getPicPathBack()+ "/" + fileName);
+
+                    sendData(road, fileName.split("_", Qt::SkipEmptyParts).at(1), "黄");
                 }else{
                     showMsg("不在工作时间内");
                     remove(fileNamePath.toLocal8Bit());
@@ -337,12 +346,14 @@ void Widget::dealPicFilesUTF_8(QString filePath)
 
 void Widget::dealPicFilesGB2312(QString filePath)
 {
-    QEventLoop eventloop;
-    QTimer::singleShot(100, &eventloop, SLOT(quit()));
-    eventloop.exec();
+//    QEventLoop eventloop;
+//    QTimer::singleShot(m_delPicWaitTime, &eventloop, SLOT(quit()));
+//    eventloop.exec();
+
+    QThread::msleep(m_delPicWaitTime);
 
     Road* road = nullptr;
-    QString cameraIp = filePath.split("/", QString::SkipEmptyParts).at(3);
+    QString cameraIp = filePath.split("/", Qt::SkipEmptyParts).at(3);
 
     foreach(Road* tmp, m_roadList){
         if(tmp->getCameraIp() == cameraIp){
@@ -365,12 +376,16 @@ void Widget::dealPicFilesGB2312(QString filePath)
     foreach (QFileInfo info, inforList) {
         QString fileName = info.fileName();
         QString fileNamePath = info.filePath();
-        QStringList strList = QString(fileName.toLocal8Bit()).split("_", QString::SkipEmptyParts);
+        QStringList strList = QString(fileName.toLocal8Bit()).split("_", Qt::SkipEmptyParts);
 
         if(strList.size() != 5) {
             showMsg("文件名格式不对：" + QString::number(strList.size()));
             showMsg(fileName);
             //showMsg(fileName.toLocal8Bit());
+            remove(fileNamePath.toLocal8Bit());
+            continue;
+        }else if(fileNamePath .contains("ini")){
+            showMsg("ini文件：" + fileNamePath);
             remove(fileNamePath.toLocal8Bit());
             continue;
         }
@@ -384,7 +399,7 @@ void Widget::dealPicFilesGB2312(QString filePath)
                 if(QTime::currentTime() > m_startTime && QTime::currentTime() < m_stopTime){
                     // 备份图片
                     rename((road->getPicPath() + "/" + fileName).toLocal8Bit(), (road->getPicPathBack()+ "/" + fileName).toLocal8Bit());
-                    sendData(road, fileName.split("_", QString::SkipEmptyParts).at(1), "黄");
+                    sendData(road, fileName.split("_", Qt::SkipEmptyParts).at(1), "黄");
                 }else{
                     showMsg("不在工作时间内");
                     remove(fileNamePath.toLocal8Bit());
@@ -402,12 +417,15 @@ void Widget::dealPicFilesGB2312(QString filePath)
 
 void Widget::dealPicFilesUnkown(QString filePath)
 {
-    QEventLoop eventloop;
-    QTimer::singleShot(100, &eventloop, SLOT(quit()));
-    eventloop.exec();
+//    QEventLoop eventloop;
+//    QTimer::singleShot(m_delPicWaitTime, &eventloop, SLOT(quit()));
+//    eventloop.exec();
+
+
+    QThread::msleep(m_delPicWaitTime);
 
     Road* road = nullptr;
-    QString cameraIp = filePath.split("/", QString::SkipEmptyParts).at(3);
+    QString cameraIp = filePath.split("/", Qt::SkipEmptyParts).at(3);
 
     foreach(Road* tmp, m_roadList){
         if(tmp->getCameraIp() == cameraIp){
@@ -430,12 +448,16 @@ void Widget::dealPicFilesUnkown(QString filePath)
     foreach (QFileInfo info, inforList) {
         QString fileName = info.fileName();
         QString fileNamePath = info.filePath();
-        QStringList strList = QString(fileName.toLocal8Bit()).split("_", QString::SkipEmptyParts);
+        QStringList strList = QString(fileName.toLocal8Bit()).split("_", Qt::SkipEmptyParts);
 
         if(strList.size() != 5) {
             showMsg("文件名格式不对：" + QString::number(strList.size()));
             showMsg(fileName);
             //showMsg(fileName.toLocal8Bit());
+            remove(fileNamePath.toLocal8Bit());
+            continue;
+        }else if(fileNamePath .contains("ini")){
+            showMsg("ini文件：" + fileNamePath);
             remove(fileNamePath.toLocal8Bit());
             continue;
         }
@@ -449,7 +471,7 @@ void Widget::dealPicFilesUnkown(QString filePath)
                 if(QTime::currentTime() > m_startTime && QTime::currentTime() < m_stopTime){
                     // 备份图片
                     rename((road->getPicPath() + "/" + fileName).toLocal8Bit(), (road->getPicPathBack()+ "/" + fileName).toLocal8Bit());
-                    sendData(road, fileName.split("_", QString::SkipEmptyParts).at(1), "黄");
+                    sendData(road, fileName.split("_", Qt::SkipEmptyParts).at(1), "黄");
                 }else{
                     showMsg("不在工作时间内");
                     remove(fileNamePath.toLocal8Bit());

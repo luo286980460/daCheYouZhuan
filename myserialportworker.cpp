@@ -53,8 +53,9 @@ void MySerialPortWorker::slotInitWorker()
 
 void MySerialPortWorker::slotSendData(QString data)
 {
-    showMsg("发送内容：" + data);
 
-    m_serialPort->write(data.toUtf8());
+    int res = m_serialPort->write(data.toUtf8());
+
+    showMsg("发送内容：" + data + QString::number(res)) ;
     m_serialPort->waitForBytesWritten();
 }
